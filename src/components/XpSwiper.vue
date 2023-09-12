@@ -1,12 +1,14 @@
 <template>
   <view>
-    <swiper class="banner" :indicator-dots="true" :circular="true" :autoplay="false">
+    <swiper
+      class="banner"
+      :indicator-dots="true"
+      :indicator-active-color="'#fff'"
+      :circular="true"
+      :autoplay="false"
+    >
       <swiper-item v-for="banner in bannerList" :key="banner.id">
         <image :src="banner.imgUrl" @tap="onPreviewImage(banner.imgUrl)"></image>
-        <!--
-        <image
-          src="https://img12.360buyimg.com/n2/jfs/t1/137205/2/39728/135040/64fbcdd7F98c1a769/c4615d546a45524b.jpg"
-        ></image> -->
       </swiper-item>
     </swiper>
   </view>
@@ -18,10 +20,10 @@ type Banner = { id: number; imgUrl: string }
 const bannerList = ref<Banner[]>(null)
 
 watchEffect(async () => {
-  http({
+  http<Banner>({
     method: 'GET',
     url: '/home/banner',
-  }).then((res) => {
+  }).then((res: ResultView<Banner>) => {
     bannerList.value = res.result
   })
 })
