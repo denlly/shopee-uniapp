@@ -1,10 +1,14 @@
 {
   "extends": "@vue/tsconfig/tsconfig.json",
   "compilerOptions": {
+    "moduleResolution": "Node",
+    "module": "ESNext",
     "target": "ESNext",
     "useDefineForClassFields": true,
     "allowJs": true,
+    "jsx": "preserve",
     "sourceMap": true,
+    "strict": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
@@ -16,7 +20,8 @@
       "@dcloudio/types",
       "miniprogram-api-typings",
       "@uni-helper/uni-app-types",
-      "@uni-helper/uni-ui-types"
+      "@uni-helper/uni-ui-types",
+      "@typescript/wechat-miniprogram"
     ]
   },
   "vueCompilerOptions": {
