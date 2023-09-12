@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMemberStore } from '@/stores/index'
 import '@/utils/http'
-import { http } from '@/utils/http'
+import http from '@/utils/http'
 
 const memberStore = useMemberStore()
 const getData = async () => {
@@ -9,7 +9,7 @@ const getData = async () => {
     method: 'GET',
     url: '/home/banner',
   }).then((res) => {
-    console.log(res)
+    // console.log(res)
   })
 }
 </script>

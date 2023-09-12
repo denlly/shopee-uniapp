@@ -7,30 +7,22 @@
       :circular="true"
       :autoplay="false"
     >
-      <swiper-item v-for="banner in bannerList" :key="banner.id">
+      <swiper-item v-for="banner in props.banners" :key="banner.id">
         <image :src="banner.imgUrl" @tap="onPreviewImage(banner.imgUrl)"></image>
       </swiper-item>
     </swiper>
   </view>
 </template>
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
-import { http, ResultView } from '@/utils/http'
-type Banner = { id: number; imgUrl: string }
-const bannerList = ref<Banner[]>(null)
+import { ref } from 'vue'
+import { getHomeBannerAPI } from '@/services/home'
+import { onLoad } from '@dcloudio/uni-app'
+import { type Banner } from '@/types/banner.d'
+const props = defineProps({ banners: Array<Banner> })
 
-watchEffect(async () => {
-  http<Banner>({
-    method: 'GET',
-    url: '/home/banner',
-  }).then((res: ResultView<Banner>) => {
-    bannerList.value = res.result
-  })
-})
-
-function onPreviewImage(url: string) {
+function onPreviewImage(url: string): void {
   uni.previewImage({
-    urls: bannerList.value.map((e) => e.imgUrl),
+    urls: props.banners.map((e: Banner) => e.imgUrl),
   })
 }
 </script>

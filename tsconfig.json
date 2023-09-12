@@ -5,6 +5,8 @@
     "module": "ESNext",
     "target": "ESNext",
     "useDefineForClassFields": true,
+    "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "jsx": "preserve",
     "sourceMap": true,
