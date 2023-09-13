@@ -17,7 +17,7 @@
 import { ref } from 'vue'
 import { getHomeBannerAPI } from '@/services/home'
 import { onLoad } from '@dcloudio/uni-app'
-import { type Banner } from '@/types/banner.d'
+import type { Banner } from '@/types/home.d'
 const props = defineProps({ banners: Array<Banner> })
 
 function onPreviewImage(url: string): void {
