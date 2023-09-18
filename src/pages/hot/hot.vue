@@ -2,44 +2,61 @@
   <view class="viewport">
     <!-- 推荐封面图 -->
     <view class="cover">
-      <image
-        src="http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/picture/2021-05-20/84abb5b1-8344-49ae-afc1-9cb932f3d593.jpg"
-      ></image>
+      <image :src="bannerPicture"></image>
     </view>
     <!-- 推荐选项 -->
     <view class="tabs">
-      <text class="text active">抢先尝鲜</text>
-      <text class="text">新品预告</text>
+      <text
+        :class="idx === activeIndex ? 'text active' : 'text'"
+        v-for="(sub, idx) in subTypes"
+        :key="sub.id"
+        @tap="activeIndex = idx"
+      >
+        {{ sub.title }}
+      </text>
     </view>
     <!-- 推荐列表 -->
-    <scroll-view scroll-y class="scroll-view">
+    <scroll-view
+      scroll-y
+      class="scroll-view"
+      v-for="(item, idx) in subTypes"
+      :key="item.id"
+      v-show="activeIndex === idx"
+      @scrolltolower="onScrollToLower()"
+    >
       <view class="goods">
         <navigator
           hover-class="none"
           class="navigator"
-          v-for="goods in 10"
-          :key="goods"
-          :url="`/pages/goods/goods?id=`"
+          v-for="item in subTypes[activeIndex].goodsItems?.items"
+          :key="item"
+          :url="`/pages/goods/goods?id={item.id}`"
         >
-          <image
-            class="thumb"
-            src="https://yanxuan-item.nosdn.127.net/5e7864647286c7447eeee7f0025f8c11.png"
-          ></image>
-          <view class="name ellipsis">不含酒精，使用安心爽肤清洁湿巾</view>
+          <image class="thumb" :src="item.picture"></image>
+          <view class="name ellipsis">{{ item.name }}</view>
           <view class="price">
             <text class="symbol">¥</text>
-            <text class="number">29.90</text>
+            <text class="number">{{ item.price }}</text>
           </view>
         </navigator>
       </view>
-      <view class="loading-text">正在加载...</view>
+      <view class="loading-text">
+        {{ item.finish ? '数据就这么多了，都拿去吧' : '正在加载...' }}
+      </view>
     </scroll-view>
   </view>
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { getHotRecommendAPI } from '@/services/hot'
+import type { Paging } from '@/types/global'
+import type { HotResult, HotSubType, HotGoodItem } from '@/types/hot'
+
 const query = defineProps<{ type: string }>()
 
+// const list
 const hotMap = [
   { type: '1', title: '特惠推荐', url: '/hot/preference' },
   { type: '2', title: '爆款推荐', url: '/hot/inVogue' },
@@ -47,8 +64,50 @@ const hotMap = [
   { type: '4', title: '新鲜好物', url: '/hot/new' },
 ]
 const currentHot = hotMap.find((e) => e.type === query.type)
+uni.setNavigationBarTitle({ title: currentHot?.title })
+const subTypes = ref<(HotSubType & { finish?: boolean })[]>([])
+
+const activeIndex = ref(0)
+// 推荐封面图
+const bannerPicture = ref('')
+
+const hotList = ref<HotResult>()
+
 /** 动态数据标识 */
-uni.setNavigationBarTitle({ title: currentHot!.title })
+const getHotRecommend = async () => {
+  getHotRecommendAPI(currentHot!.url, { page: 1, pageSize: 10 }).then((res) => {
+    // res.result
+    console.log(res.result, 'res.result')
+    hotList.value = res.result
+    bannerPicture.value = res.result.bannerPicture
+    subTypes.value = res.result.subTypes
+  })
+}
+
+onLoad(() => {
+  getHotRecommend()
+})
+
+const onScrollToLower = async () => {
+  const currentSubTypes = subTypes.value[activeIndex.value]
+  if (currentSubTypes.goodsItems.page < currentSubTypes.goodsItems.pages) {
+    // 当前页码累加
+    currentSubTypes.goodsItems.page++
+  } else {
+    // 标记已结束
+    currentSubTypes.finish = true
+    // 退出并轻提示
+    return uni.showToast({ icon: 'none', title: '数据就这么多了~' })
+  }
+  getHotRecommendAPI(currentHot!.url, {
+    subType: currentSubTypes.id,
+    page: currentSubTypes.goodsItems.page,
+    pageSize: currentSubTypes.goodsItems.pageSize,
+  }).then((res) => {
+    const newSubTypes = res.result.subTypes[activeIndex.value]
+    currentSubTypes.goodsItems.items.push(...newSubTypes.goodsItems.items)
+  })
+}
 </script>
 
 <style lang="scss">

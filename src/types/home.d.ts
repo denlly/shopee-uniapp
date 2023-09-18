@@ -9,4 +9,16 @@ type Category = {
   name: string
   icon: string
 }
-export { Banner, type Category }
+
+type Hot = {
+  alt: string
+  pictures: string[]
+  target: string
+  type: string
+  title: string
+  id: string
+}
+
+type Guess = Product
+
+export type { Banner, Category, Hot, Guess }
