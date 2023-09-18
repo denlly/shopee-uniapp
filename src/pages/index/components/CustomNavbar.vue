@@ -20,7 +20,10 @@ const { safeArea } = uni.getWindowInfo()
   background-image: url(@/static/images/navigator_bg.png);
   background-size: cover;
   position: relative;
-  display: flex;
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   flex-direction: column;
 
   padding-top: 20px;
