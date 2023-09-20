@@ -14,7 +14,6 @@
 </template>
 
 <script lang="ts" setup>
-import Vue from 'vue'
 import type { Hot } from '@/types/home.d'
 
 const props = defineProps({
