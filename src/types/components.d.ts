@@ -8,7 +8,7 @@ import type XpSwiper from '@/components/XpSwiper.vue'
 import 'vue'
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    pSwiper: typeof XpSwiper
+    XpSwiper: typeof XpSwiper
     XpGuessInstance: typeof XpGuess
   }
 }
