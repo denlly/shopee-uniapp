@@ -16,7 +16,7 @@
         <!-- 热门模块 -->
         <HotPanel :hots="hotList" />
         <XpGuess ref="guessRef"></XpGuess>
-        <RecommandPanel />
+        <!-- <RecommandPanel /> -->
       </template>
     </scroll-view>
   </view>
