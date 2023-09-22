@@ -5,15 +5,15 @@ import type { Banner } from '@/types/home'
 import type { Category } from '@/types/category'
 import { onLoad } from '@dcloudio/uni-app'
 import { getCategoryTopAPI } from '@/services/category'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 onLoad(async () => {
   getBannerList()
   getCategoryTop()
 })
 const bannerList = ref<Banner[]>()
-const categoryList = ref<Category[]>()
-const activeIndex = ref<Number>(0)
+const categoryList = ref<Category[]>([])
+const activeIndex = ref(0)
 const getBannerList = async () => {
   const res = await getHomeBannerAPI('2')
   // console.log(res.result)
@@ -24,6 +24,9 @@ const getCategoryTop = async () => {
   // console.log(res, 'getCategoryTop')
   categoryList.value = res.result
 }
+const subCategoryList = computed(() => {
+  return categoryList.value[activeIndex.value]?.children || []
+})
 </script>
 
 <template>
@@ -53,27 +56,24 @@ const getCategoryTop = async () => {
         <!-- 焦点图 -->
         <XpSwiper class="banner" :banners="bannerList" />
         <!-- 内容区域 -->
-        <view class="panel" v-for="item in 3" :key="item">
+        <view class="panel" v-for="item in subCategoryList" :key="item.id">
           <view class="title">
-            <text class="name">宠物用品</text>
+            <text class="name">{{ item.name }}</text>
             <navigator class="more" hover-class="none">全部</navigator>
           </view>
           <view class="section">
             <navigator
-              v-for="goods in 4"
-              :key="goods"
+              v-for="good in item.goods"
+              :key="good.id"
               class="goods"
               hover-class="none"
-              :url="`/pages/goods/goods?id=`"
+              :url="`/pages/goods/goods?id=${good.id}`"
             >
-              <image
-                class="image"
-                src="https://yanxuan-item.nosdn.127.net/674ec7a88de58a026304983dd049ea69.jpg"
-              ></image>
-              <view class="name ellipsis">木天蓼逗猫棍</view>
+              <image class="image" :src="good.picture"></image>
+              <view class="name ellipsis">{{ good.name }}</view>
               <view class="price">
                 <text class="symbol">¥</text>
-                <text class="number">16.00</text>
+                <text class="number">{{ good.price }}</text>
               </view>
             </navigator>
           </view>
