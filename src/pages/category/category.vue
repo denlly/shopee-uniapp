@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Skeleton from './components/skeleton.vue'
 import { getHomeBannerAPI } from '@/services/home'
 import type { PageResult } from '@/types/global'
 import type { Banner } from '@/types/home'
@@ -8,12 +9,14 @@ import { getCategoryTopAPI } from '@/services/category'
 import { ref, computed } from 'vue'
 
 onLoad(async () => {
-  getBannerList()
-  getCategoryTop()
+  isLoading.value = true
+  await Promise.all([getBannerList(), getCategoryTop()])
+  isLoading.value = false
 })
 const bannerList = ref<Banner[]>()
 const categoryList = ref<Category[]>([])
 const activeIndex = ref(0)
+const isLoading = ref(false)
 const getBannerList = async () => {
   const res = await getHomeBannerAPI('2')
   // console.log(res.result)
@@ -38,7 +41,8 @@ const subCategoryList = computed(() => {
       </view>
     </view>
     <!-- 分类 -->
-    <view class="categories">
+    <Skeleton v-if="isLoading"></Skeleton>
+    <view v-else class="categories">
       <!-- 左侧：一级分类 -->
       <scroll-view class="primary" scroll-y>
         <view
