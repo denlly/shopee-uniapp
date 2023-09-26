@@ -16,11 +16,8 @@ const orderTypes = [
 ]
 
 const memberStore = useMemberStore()
-const member = ref()
 
-onLoad(() => {
-  member.value = memberStore.profile
-})
+onLoad(() => {})
 
 const { guessRef, onScrollToLower } = useGuessList()
 </script>
@@ -30,15 +27,21 @@ const { guessRef, onScrollToLower } = useGuessList()
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
       <!-- 情况1：已登录 -->
-      <view class="overview" v-if="member">
+      <view class="overview" v-if="memberStore.profile">
         <navigator url="/pagesMember/profile/profile" hover-class="none">
           <image class="avatar" mode="aspectFill" src="../../static/images/avatar.png"></image>
         </navigator>
         <view class="meta">
-          <view class="nickname"> {{ member.nickname || member.account }} </view>
+          <view class="nickname">
+            {{ memberStore.profile.nickname || memberStore.profile.account }}
+          </view>
           <navigator
             class="extra"
-            :url="member.avatar ? member.avatar : '/pagesMember/profile/profile'"
+            :url="
+              memberStore.profile.avatar
+                ? memberStore.profile.avatar
+                : '/pagesMember/profile/profile'
+            "
             hover-class="none"
           >
             <text class="update">更新头像昵称</text>
