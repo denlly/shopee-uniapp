@@ -33,11 +33,11 @@ import { ref, onMounted } from 'vue'
 import type { Banner, Category, Hot } from '@/types/home.d'
 import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotAPI } from '@/services/home'
 import type { XpGuess } from '@/types/components'
+import { useGuessList } from '@/composables'
 const bannerList = ref<Banner[]>()
 const categoryList = ref<Category[]>()
 const hotList = ref<Hot[]>()
 const isRefreshing = ref(false)
-const guessRef = ref<XpGuess>(null)
 const isLoading = ref(false)
 onLoad(async () => {
   isLoading.value = true
@@ -65,10 +65,8 @@ const onFresherRefresh = async () => {
 
   isRefreshing.value = false
 }
-const onScrollToLower = async () => {
-  await guessRef.value?.getMore()
-  console.log('触底了')
-}
+
+const { guessRef, onScrollToLower } = useGuessList()
 </script>
 
 <style lang="scss">

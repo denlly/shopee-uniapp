@@ -9,6 +9,8 @@ import 'vue'
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     XpSwiper: typeof XpSwiper
-    XpGuessInstance: typeof XpGuess
+    XpGuess: typeof XpGuess
   }
 }
+export type XpGuessInstance = InstanceType<typeof XpGuess>
+export type XpSwiperInstance = InstanceType<typeof XpSwiper>
