@@ -25,7 +25,7 @@ const onGetPhoneNumberSimple: UniHelper.ButtonOnGetphonenumber = async (event) =
   const encryptedData = event.detail!.encryptedData!
   const iv = event.detail.iv
   // console.log({ code, encryptedData, iv }, '{ code, encryptedData, iv }')
-  const res = await postLoginWxSimpleAPI<ResultView<LoginResult>>('13500203308')
+  const res = await postLoginWxSimpleAPI<ResultView<LoginResult>>('13123456789')
   //持久化到本地
   const memberStore = useMemberStore()
   memberStore.setProfile(res.result)

@@ -5,8 +5,10 @@
       <text class="logo-text">大牌 高调 奢华</text>
     </view>
     <view class="logo">
-      <text class="icon-search">搜索商品</text>
-      <text class="icon-scan"></text>
+      <view class="input">
+        <text class="icon-search">搜索商品</text>
+        <text class="icon-scan"></text>
+      </view>
     </view>
   </view>
 </template>
@@ -20,21 +22,32 @@ const { safeArea } = uni.getWindowInfo()
   background-image: url(@/static/images/navigator_bg.png);
   background-size: cover;
   position: relative;
-  display: block;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  display: flex;
   flex-direction: column;
-
   padding-top: 20px;
   .logo {
     display: flex;
     align-items: center;
-    height: 64rpx;
+    height: 96rpx;
     padding-left: 30rpx;
+    padding-top: 20rpx;
+    padding-bottom: 30rpx;
+    justify-content: center;
+    .input {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 90%;
+      height: 64rpx;
+      padding: auto 30rpx;
+      color: #8b8b8b;
+      font-size: 28rpx;
+      border-radius: 32rpx;
+      background-color: #f3f4f4;
+    }
     .logo-image {
       width: 166rpx;
-      height: 39rpx;
+      height: 44rpx;
     }
     .logo-text {
       flex: 1;
@@ -48,6 +61,7 @@ const { safeArea } = uni.getWindowInfo()
   }
   .search {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
     padding: 0 10rpx 0 26rpx;
@@ -59,6 +73,7 @@ const { safeArea } = uni.getWindowInfo()
     background-color: rgba(255, 255, 255, 0.5);
   }
   .icon-search {
+    padding-left: 20rpx;
     &::before {
       margin-right: 10rpx;
     }
