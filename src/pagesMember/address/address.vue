@@ -2,7 +2,7 @@
 import type { AddressItem } from '@/types/address'
 import { ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { getMemberAddressAPI } from '@/services/address'
+import { getMemberAddressAPI, deleteMemberAddressByIdAPI } from '@/services/address'
 //
 const list = ref<Array<AddressItem>>([])
 
@@ -14,6 +14,34 @@ const getMemberAddressList = async () => {
   list.value = res.result
   console.log(res, 'getMemberAddressList res')
 }
+// const options = [
+//   {
+//     text: '取消',
+//     style: {
+//       backgroundColor: '#007aff',
+//     },
+//   },
+//   {
+//     text: '确认',
+//     style: {
+//       backgroundColor: '#dd524d',
+//     },
+//   },
+// ]
+const onDeleteAddress = async (id: string) => {
+  console.log('删除')
+  uni.showModal({
+    content: '确定删除吗',
+    success: async (event) => {
+      if (event.confirm) {
+        const res = await deleteMemberAddressByIdAPI(id)
+        console.log(res, 'deleteMemberAddressByIdAPI, res')
+        uni.showModal({ content: '删除成功' })
+        getMemberAddressList()
+      }
+    },
+  })
+}
 </script>
 
 <template>
@@ -21,9 +49,9 @@ const getMemberAddressList = async () => {
     <!-- 地址列表 -->
     <scroll-view class="scroll-view" scroll-y>
       <view v-if="list.length > 0" class="address">
-        <view class="address-list">
+        <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
-          <view class="item" v-for="item in list" :key="item.id">
+          <uni-swipe-action-item class="item" v-for="item in list" :key="item.id">
             <view class="item-content">
               <view class="user">
                 {{ item.receiver }}
@@ -39,8 +67,11 @@ const getMemberAddressList = async () => {
                 修改
               </navigator>
             </view>
-          </view>
-        </view>
+            <template #right>
+              <button class="delete-button" @tap="onDeleteAddress(item.id)">删除</button>
+            </template>
+          </uni-swipe-action-item>
+        </uni-swipe-action>
       </view>
       <view v-else class="blank">暂无收货地址</view>
     </scroll-view>
