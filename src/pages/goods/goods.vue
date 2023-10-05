@@ -1,45 +1,169 @@
+<script lang="ts" setup>
+import { onLoad } from '@dcloudio/uni-app'
+import { ref, computed } from 'vue'
+import { getGoodByIdAPI } from '@/services/goods'
+import type { GoodsResult, SkuItem, SpecItem } from '@/types/goods'
+import type {
+  SkuPopupEvent,
+  SkuPopupInstance,
+  SkuPopupLocaldata,
+} from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku.popup'
+import { postMemberAddressAPI } from '@/services/address'
+import { postMemberCartAPI } from '@/services/carts'
+
+const { safeAreaInsets } = uni.getSystemInfoSync()
+const query = defineProps<{ id: string }>()
+const good = ref<GoodsResult>({} as GoodsResult)
+const currentPicIdx = ref(0)
+const isShowSku = ref(false)
+const skuMode = ref<SkuMode>(1)
+const goodsInfo = ref<SkuPopupLocaldata>({} as SkuPopupLocaldata)
+
+const skuPopupRef = ref<SkuPopupInstance>()
+
+const selectPopup = computed(() => {
+  return skuPopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
+})
+enum SkuMode {
+  Both = 1,
+  Cart = 2,
+  Buy = 3,
+}
+
+onLoad(async () => {
+  await getGoodById()
+})
+const getGoodById = async () => {
+  console.log(query, 'props.id')
+  if (!query.id) {
+    uni.showToast({
+      msg: '缺少参数',
+      icon: 'fail',
+    })
+    return
+  }
+  const res = await getGoodByIdAPI(query.id)
+  console.log(res, 'res')
+  good.value = res.result
+  goodsInfo.value = {
+    _id: res.result.id,
+    name: res.result.name,
+    goods_thumb: res.result.mainPictures[0],
+    sku_list: res.result.skus.map((item: SkuItem) => {
+      return {
+        _id: item.id,
+        goods_name: item.id,
+        goods_id: item.id,
+        image: item.picture,
+        price: item.price * 100,
+        stock: item.inventory,
+        sku_name_arr: item.specs.map((si) => si.valueName),
+      }
+    }),
+    spec_list: res.result.specs.map((item: SpecItem) => {
+      return {
+        name: item.name,
+        list: item.values,
+      }
+    }),
+  }
+}
+const onSwiperChange = (event) => {
+  currentPicIdx.value = event.detail.current
+}
+
+const onOpenSkuPopup = () => {
+  console.log('onOpenSkuPopup')
+  /**
+   * 获取商品信息
+   * 这里可以看到每次打开SKU都会去重新请求商品信息,为的是每次打开SKU组件可以实时看到剩余库存
+   */
+  isShowSku.value = true
+}
+
+const onCloseSkuPopup = () => {
+  console.log('监听 - 关闭sku组件')
+}
+const addCartFn = (obj) => {
+  let { selectShop } = obj
+  // 模拟添加到购物车,请替换成你自己的添加到购物车逻辑
+  let res = {}
+  let name = selectShop.goods_name
+  if (selectShop.sku_name != '默认') {
+    name += '-' + selectShop.sku_name_arr
+  }
+  res.msg = `${name} 已添加到购物车`
+  if (typeof obj.success == 'function') obj.success(res)
+}
+// 加入购物车按钮
+const onAddCart = (selectShop: SkuPopupEvent) => {
+  console.log(selectShop, '监听 - 加入购物车')
+  addCartFn({
+    selectShop: selectShop,
+    success: async function (res) {
+      // 实际业务时,请替换自己的加入购物车逻辑
+      const sender = await postMemberCartAPI({
+        skuId: selectShop._id,
+        count: selectShop.buy_num,
+      })
+      console.log(sender, 'sender')
+      toast(res.msg)
+      setTimeout(function () {
+        isShowSku.value = false
+      }, 300)
+    },
+  })
+}
+const onBuyNow = (selectShop) => {
+  console.log('监听 - 立即购买')
+  addCartFn({
+    selectShop: selectShop,
+    success: function (res) {
+      // 实际业务时,请替换自己的立即购买逻辑
+      toast('立即购买')
+    },
+  })
+}
+const onSelectSpecs = (mode: SkuMode) => {
+  skuMode.value = mode
+  isShowSku.value = true
+}
+
+const toast = (msg) => {
+  uni.showToast({
+    title: msg,
+    icon: 'none',
+  })
+}
+</script>
 <template>
+  <vk-data-goods-sku-popup
+    ref="skuPopupRef"
+    v-model="isShowSku"
+    border-radius="20"
+    :localdata="goodsInfo"
+    :mode="skuMode"
+    @open="onOpenSkuPopup"
+    @close="onCloseSkuPopup"
+    @add-cart="onAddCart"
+    @buy-now="onBuyNow"
+    add-cart-background-color="#FFA868"
+    buy-now-background-color="#E96100"
+  ></vk-data-goods-sku-popup>
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">
       <!-- 商品主图 -->
       <view class="preview">
-        <swiper circular>
-          <swiper-item>
-            <image
-              mode="aspectFill"
-              src="https://yanxuan-item.nosdn.127.net/99c83709ca5f9fd5c5bb35d207ad7822.png"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              mode="aspectFill"
-              src="https://yanxuan-item.nosdn.127.net/f9107d47c08f0b99c097e30055c39e1a.png"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              mode="aspectFill"
-              src="https://yanxuan-item.nosdn.127.net/754c56785cc8c39f7414752f62d79872.png"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              mode="aspectFill"
-              src="https://yanxuan-item.nosdn.127.net/ef16f8127610ef56a2a10466d6dae157.jpg"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              mode="aspectFill"
-              src="https://yanxuan-item.nosdn.127.net/1f0c3f5d32b0e804deb9b3d56ea6c3b2.png"
-            />
+        <swiper circular @change="onSwiperChange">
+          <swiper-item v-for="(pic, idx) in good.mainPictures" :key="idx">
+            <image mode="aspectFill" :src="pic" />
           </swiper-item>
         </swiper>
         <view class="indicator">
-          <text class="current">1</text>
+          <text class="current">{{ currentPicIdx + 1 }}</text>
           <text class="split">/</text>
-          <text class="total">5</text>
+          <text class="total">{{ good.mainPictures?.length }}</text>
         </view>
       </view>
 
@@ -47,17 +171,17 @@
       <view class="meta">
         <view class="price">
           <text class="symbol">¥</text>
-          <text class="number">29.90</text>
+          <text class="number">{{ good.price }}</text>
         </view>
-        <view class="name ellipsis">云珍·轻软旅行长绒棉方巾 </view>
-        <view class="desc"> 轻巧无捻小方巾，旅行便携 </view>
+        <view class="name ellipsis">{{ good.name }} </view>
+        <view class="desc"> {{ good.desc }} </view>
       </view>
 
       <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow">
+        <view class="item arrow" @tap="onSelectSpecs(SkuMode.Both)">
           <text class="label">选择</text>
-          <text class="text ellipsis"> 请选择商品规格 </text>
+          <text class="text ellipsis"> {{ selectPopup }} </text>
         </view>
         <view class="item arrow">
           <text class="label">送至</text>
@@ -139,28 +263,11 @@
       </navigator>
     </view>
     <view class="buttons">
-      <view class="addcart"> 加入购物车 </view>
-      <view class="buynow"> 立即购买 </view>
+      <view class="addcart" @click="onSelectSpecs(SkuMode.Cart)"> 加入购物车 </view>
+      <view class="buynow" @click="onSelectSpecs(SkuMode.Buy)"> 立即购买 </view>
     </view>
   </view>
 </template>
-
-<script lang="ts" setup>
-import { onLoad } from '@dcloudio/uni-app'
-import Vue from 'vue'
-import { getGoodByIdAPI } from '@/services/goods'
-const { safeAreaInsets } = uni.getSystemInfoSync()
-
-const query = defineProps<{ id: string }>()
-
-onLoad(async () => {
-  await getGoodById()
-})
-const getGoodById = async () => {
-  console.log(query, 'props.id')
-  const res = await getGoodByIdAPI(query.id)
-}
-</script>
 
 <style lang="scss">
 page {

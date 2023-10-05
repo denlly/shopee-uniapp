@@ -30,7 +30,7 @@
           class="navigator"
           v-for="item in subTypes[activeIndex].goodsItems?.items"
           :key="item"
-          :url="`/pages/goods/goods?id={item.id}`"
+          :url="`/pages/goods/goods?id=${item.id}`"
         >
           <image class="thumb" :src="item.picture"></image>
           <view class="name ellipsis">{{ item.name }}</view>
