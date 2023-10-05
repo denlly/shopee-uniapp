@@ -29,14 +29,15 @@ const onGetPhoneNumberSimple: UniHelper.ButtonOnGetphonenumber = async (event) =
   //持久化到本地
   const memberStore = useMemberStore()
   memberStore.setProfile(res.result)
-  console.log(res, 'onGetPhoneNumberSimple.res')
+  // console.log(res, 'onGetPhoneNumberSimple.res')
   uni.showToast({
     title: '登录成功',
     icon: 'success',
     duration: 2000,
   })
   setTimeout(() => {
-    uni.switchTab({ url: '/pages/my/my' })
+    // uni.switchTab({ url: '/pages/my/my' })
+    uni.navigateBack()
   }, 2000)
 }
 </script>

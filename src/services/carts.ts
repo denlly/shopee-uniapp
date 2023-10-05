@@ -12,3 +12,37 @@ export const postMemberCartAPI = (data: { skuId: string; count: number }) => {
     data,
   })
 }
+
+export const getMemberCartAPI = () => {
+  return http<ResultView<CartItem>>({
+    method: 'GET',
+    url: '/member/cart',
+  })
+}
+
+//
+export const deleteMemberCartAPI = (ids: string[]) => {
+  return http({
+    method: 'DELETE',
+    url: '/member/cart',
+    data: { ids },
+  })
+}
+
+export const putMemberCartBySkuIdAPI = (
+  skuId: string,
+  data: { selected?: boolean; count?: number },
+) => {
+  return http({
+    method: 'PUT',
+    url: `/member/cart/${skuId}`,
+    data,
+  })
+}
+export const putMemberCartSelectedAPI = (selected: boolean) => {
+  return http({
+    method: 'PUT',
+    url: `/member/cart/selected`,
+    data: { selected },
+  })
+}
