@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import Vue from 'vue'
+import { ref } from 'vue'
 </script>
 
 <style scoped lang="scss">

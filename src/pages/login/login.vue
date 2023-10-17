@@ -36,8 +36,7 @@ const onGetPhoneNumberSimple: UniHelper.ButtonOnGetphonenumber = async (event) =
     duration: 2000,
   })
   setTimeout(() => {
-    // uni.switchTab({ url: '/pages/my/my' })
-    uni.navigateBack()
+    uni.switchTab({ url: '/pages/my/my' })
   }, 2000)
 }
 </script>
